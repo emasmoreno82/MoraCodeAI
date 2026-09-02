@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#121212"
+    android:fitsSystemWindows="true"
+    android:padding="8dp">
+
+    <!-- SELECTORES DE LENGUAJE, IDIOMA Y BOTÓN DE VOZ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:paddingBottom="6dp">
+
+        <!-- Selector de Lenguaje de Programación -->
+        <Spinner
+            android:id="@+id/spinnerProgLang"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FFFFFF" />
+
+        <!-- Selector de Idioma de la App / Voz -->
+        <Spinner
+            android:id="@+id/spinnerAppLang"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#FFFFFF" />
+
+        <!-- Botón Silenciar/Activar Voz -->
+        <Button
+            android:id="@+id/btnToggleVoice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔊"
+            android:textSize="14sp"
+            android:backgroundTint="#333333"
+            android:textColor="#FFFFFF"
+            android:minWidth="48dp"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
+    <!-- Editor de Código -->
+    <EditText
+        android:id="@+id/editCode"
+        android:layout_width="match_parent"
+        android:layout_height="75dp"
+        android:background="#1E1E1E"
+        android:hint="Escribe tu código aquí..."
+        android:textColor="#FFFFFF"
+        android:textColorHint="#888888"
+        android:textSize="14sp"
+        android:gravity="top"
+        android:padding="8dp"
+        android:inputType="textMultiLine" />
+
+    <!-- Botón Probar Código -->
+    <Button
+        android:id="@+id/btnRunCode"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="▶️ Probar Código del Editor"
+        android:textSize="12sp"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#03A9F4"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"/>
+
+    <!-- Lista del Chat -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chatRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp" />
+
+    <!-- Botones de Acción Rápida -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingBottom="4dp">
+
+        <Button
+            android:id="@+id/btnCheckCode"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🔍 Revisar"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#2196F3"
+            android:layout_margin="2dp"/>
+
+        <Button
+            android:id="@+id/btnChallenge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="⭐ Reto"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#4CAF50"
+            android:layout_margin="2dp"/>
+
+        <Button
+            android:id="@+id/btnDetail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💡 Explicar"
+            android:textSize="11sp"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#9C27B0"
+            android:layout_margin="2dp"/>
+    </LinearLayout>
+
+    <!-- Input de Mensaje y Enviar -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/editMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:hint="Pregúntale a Mora..."
+            android:textColor="#FFFFFF"
+            android:textColorHint="#888888"
+            android:background="#1E1E1E"
+            android:padding="10dp"
+            android:textSize="14sp"
+            android:inputType="text" />
+
+        <Button
+            android:id="@+id/btnSend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Enviar"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#00838F"
+            android:layout_marginStart="4dp"/>
+    </LinearLayout>
+
+</LinearLayout>
