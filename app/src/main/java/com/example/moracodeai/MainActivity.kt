@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.ai.client.generativeai.GenerativeModel
+import com.google.ai.client.generativeai.type.generationConfig
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -35,13 +36,17 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private val chatList = mutableListOf<Message>()
     private lateinit var chatAdapter: ChatAdapter
 
-    private var isVoiceEnabled = true // Estado del sonido
+    private var isVoiceEnabled = true
 
-    private val geminiApiKey = "INGRESAR_TU_CLAVE_AQUI"
+    // NOTA DE SEGURIDAD: Cuando vayas a compilar para la Play Store o subir a GitHub,
+    // recuerda cambiar este string por BuildConfig.GEMINI_API_KEY como configuramos antes.
+    private val geminiApiKey = "AQUI_VA_LA_API_KEY_DEL_JURADO"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        supportActionBar?.hide()
 
         textToSpeech = TextToSpeech(this, this)
 
@@ -68,7 +73,6 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
         chatList.add(Message(welcomeText, false))
         chatAdapter.notifyItemInserted(chatList.size - 1)
 
-        // Lógica del Botón Silenciar / Activar Voz
         btnToggleVoice.setOnClickListener {
             isVoiceEnabled = !isVoiceEnabled
             if (isVoiceEnabled) {
@@ -118,13 +122,17 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     private fun setupSpinners() {
         spinnerProgLang?.let { spinner ->
             val progLangs = arrayOf("Python", "JavaScript", "HTML", "CSS", "SQL")
-            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, progLangs)
+            // Ahora utiliza el layout personalizado que creaste (spinner_item_blanco.xml)
+            val adapter = ArrayAdapter(this, R.layout.spinner_item_blanco, progLangs)
+            adapter.setDropDownViewResource(R.layout.spinner_item_blanco)
             spinner.adapter = adapter
         }
 
         spinnerAppLang?.let { spinner ->
             val appLangs = arrayOf("Español", "Inglés", "Alemán", "Japonés", "Francés")
-            val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, appLangs)
+            // Ahora utiliza el layout personalizado que creaste (spinner_item_blanco.xml)
+            val adapter = ArrayAdapter(this, R.layout.spinner_item_blanco, appLangs)
+            adapter.setDropDownViewResource(R.layout.spinner_item_blanco)
             spinner.adapter = adapter
         }
     }
@@ -149,9 +157,14 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
         CoroutineScope(Dispatchers.IO).launch {
             try {
+                // MODELO INYECTADO: 3.5 Flash-Lite para máxima velocidad y estabilidad
                 val generativeModel = GenerativeModel(
-                    modelName = "gemini-3.6-flash",
-                    apiKey = geminiApiKey
+                    modelName = "gemini-3.5-flash-lite",
+                    apiKey = geminiApiKey,
+                    generationConfig = generationConfig {
+                        maxOutputTokens = 400
+                        temperature = 0.7f
+                    }
                 )
 
                 val prompt = """
@@ -164,9 +177,9 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                     REGLAS CRÍTICAS: 
                     1. Responde 100% en el idioma: $appLanguage.
                     2. Tus explicaciones y correcciones deben estar basadas estrictamente en $programmingLanguage.
-                    3. NO te presentes (no digas "Hola, soy Mora"). Ve directo a la respuesta.
+                    3. NO te presentes. Ve directo a la respuesta.
                     4. SÉ MUY CONCISA Y RÁPIDA. Da explicaciones cortas y directas.
-                    5. Guía al estudiante paso a paso, usa emojis, NO le des el código final resuelto directamente.
+                    5. Guía al estudiante paso a paso, usa emojis.
                 """.trimIndent()
 
                 val response = generativeModel.generateContent(prompt)
@@ -181,8 +194,19 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
                 }
             } catch (ex: Exception) {
                 withContext(Dispatchers.Main) {
-                    val connError = "Error: ${ex.message}"
-                    chatList[typingIndex] = Message(connError, false)
+                    val errorMessage = ex.message ?: ""
+                    val friendlyError = when {
+                        errorMessage.contains("503") || errorMessage.contains("demand") ->
+                            "Mora está recibiendo muchas consultas en este momento. 🐾 ¡Reintenta en unos segundos!"
+                        errorMessage.contains("Quota") || errorMessage.contains("429") ->
+                            "Mora necesita un respiro. 🐾 ¡Has hecho muchas consultas seguidas! Espera un minuto."
+                        errorMessage.contains("403") ->
+                            "Error de autenticación con la API Key. Verifica tu clave. 🐾"
+                        else ->
+                            "ERROR TÉCNICO: $errorMessage"
+                    }
+
+                    chatList[typingIndex] = Message(friendlyError, false)
                     chatAdapter.notifyItemChanged(typingIndex)
                     chatRecyclerView.scrollToPosition(typingIndex)
                 }
@@ -191,7 +215,6 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
     }
 
     private fun speakCleanText(text: String, language: String) {
-        // Si el usuario silenció la voz, no reproducir nada
         if (!isVoiceEnabled) return
 
         val cleaned = text
