@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity(), TextToSpeech.OnInitListener {
 
     // NOTA DE SEGURIDAD: Cuando vayas a compilar para la Play Store o subir a GitHub,
     // recuerda cambiar este string por BuildConfig.GEMINI_API_KEY como configuramos antes.
-    private val geminiApiKey = "AQUI_VA_LA_API_KEY_DEL_JURADO"
+    private val geminiApiKey = "TU_API_KEY_DE_GOOGLE_AQUI"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
